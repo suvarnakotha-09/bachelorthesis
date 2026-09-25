@@ -1,0 +1,58 @@
+# Python environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+*.executed.ipynb
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary experiment directories
+outputs_*/
+outputs_smoke/
+
+# Keep the reproducibility records in outputs/, but do not publish
+# report/LaTeX derivatives or editor-generated files.
+outputs/*.tex
+outputs/results_summary.md
+outputs/results_summary.tex
+outputs/metrics.png
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Thesis source and thesis-only assets are kept locally for the author,
+# but are intentionally excluded from the public code repository.
+thesis.tex
+thesis.ipynb
+thesis-refs.bib
+thesis_suvarna/
+/flowchart.png
+/mae_rmse_speed.png
+/mape_percent.png
+/per.png
+thesis*.pdf
+
+# Thesis-specific local helper scripts; the public repository contains the
+# experiment module, notebook, tests, and protocol instead.
+tools/

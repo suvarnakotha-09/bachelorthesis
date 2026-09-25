@@ -1,0 +1,165 @@
+{
+  "experiment": "univariate_traffic_speed_one_step",
+  "created_utc": "2026-09-25T13:44:25.736588+00:00",
+  "seed": 42,
+  "fast": false,
+  "run_timesfm": true,
+  "target_column": "traffic_speed",
+  "feature_columns": [
+    "traffic_speed"
+  ],
+  "weather_features_used": false,
+  "context_len": 24,
+  "horizon": 1,
+  "batch_size": 64,
+  "data_loader_shuffle": false,
+  "sample_limit_per_split": null,
+  "split_fractions": {
+    "train": 0.7,
+    "validation": 0.1,
+    "test": 0.2
+  },
+  "scaler": {
+    "class": "MinMaxScaler",
+    "feature_range": [
+      0.0,
+      1.0
+    ],
+    "fit_split": "train",
+    "fit_raw_rows": 21168,
+    "fit_raw_index_range": [
+      0,
+      21168
+    ],
+    "training_min": 3.8888888359069824,
+    "training_max": 70.0
+  },
+  "data": {
+    "path": "METR_LA_with_Weather_5min.csv",
+    "timestamp_column": "Unnamed: 0",
+    "raw_total": 30240,
+    "raw_by_split": {
+      "train": 21168,
+      "validation": 3024,
+      "test": 6048
+    },
+    "available_sample_by_split": {
+      "train": 21144,
+      "validation": 3024,
+      "test": 6048
+    },
+    "used_sample_by_split": {
+      "train": 21144,
+      "validation": 3024,
+      "test": 6048
+    },
+    "boundary_rows_without_target": {
+      "train": 24,
+      "validation": 0,
+      "test": 0
+    },
+    "boundaries_half_open": {
+      "train": {
+        "start": 0,
+        "end": 21168
+      },
+      "validation": {
+        "start": 21168,
+        "end": 24192
+      },
+      "test": {
+        "start": 24192,
+        "end": 30240
+      }
+    }
+  },
+  "training": {
+    "optimizer": "Adam",
+    "criterion": "MSELoss (scaled target)",
+    "selection_criterion": "L1Loss (scaled validation MAE)",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "gradient_clip_norm": 1.0,
+    "epochs_requested": 20,
+    "patience": 5,
+    "early_stopping_split": "validation",
+    "checkpoint_selection_split": "validation",
+    "test_used_for_selection": false
+  },
+  "software_hardware": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "python_version": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+    "cpu_count": 12,
+    "system_memory_bytes": 16369967104,
+    "device": "cpu",
+    "torch_deterministic_algorithms": true,
+    "cuda_available": false,
+    "cuda_device_count": 0,
+    "cuda_devices": [],
+    "versions": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.0",
+      "matplotlib": "3.11.2",
+      "psutil": "7.2.2",
+      "timesfm": "2.0.2"
+    },
+    "physical_cpu_count": 6
+  },
+  "models": {
+    "LSTM": {
+      "trainable": true,
+      "parameter_count": 50497,
+      "best_epoch": 6,
+      "best_validation_loss_scaled": 0.020735996543730376,
+      "best_validation_mae_scaled": 0.020735996543730376,
+      "training_time_seconds": 60.71970519999741,
+      "inference_latency_ms_per_batch": 4.890316841805256,
+      "inference_latency_ms_per_1000_samples": 76.8154927201553,
+      "optimizer": "Adam",
+      "criterion": "MSELoss",
+      "selection_criterion": "L1Loss (scaled validation MAE)"
+    },
+    "DSS-softmax": {
+      "trainable": true,
+      "parameter_count": 29825,
+      "best_epoch": 10,
+      "best_validation_loss_scaled": 0.025425843204613083,
+      "best_validation_mae_scaled": 0.025425843204613083,
+      "training_time_seconds": 1032.1284833999816,
+      "inference_latency_ms_per_batch": 37.62386421011271,
+      "inference_latency_ms_per_1000_samples": 590.983316792445,
+      "optimizer": "Adam",
+      "criterion": "MSELoss",
+      "selection_criterion": "L1Loss (scaled validation MAE)"
+    },
+    "TimesFM 2.5 PyTorch": {
+      "trainable": false,
+      "parameter_count": 231289280,
+      "torch_compile": false,
+      "forecast_horizon": 1,
+      "context_len": 24,
+      "inference_batch_size": 32,
+      "input_units": "raw traffic_speed",
+      "input_normalization": "TimesFM internal normalization",
+      "checkpoint": "google/timesfm-2.5-200m-pytorch",
+      "inference_latency_ms_per_batch": 412.0699736841121,
+      "inference_latency_ms_per_1000_samples": 6472.659970236549
+    }
+  },
+  "outputs": {
+    "metrics_csv": "outputs/metrics.csv",
+    "efficiency_csv": "outputs/efficiency.csv",
+    "metric_figure": "outputs/figures/metrics_by_unit.png",
+    "forecast_figure": "outputs/figures/forecast_comparison.png",
+    "unit_separated_figures": {
+      "mae_rmse_speed": "outputs/figures/mae_rmse_speed.png",
+      "mape_percent": "outputs/figures/mape_percent.png"
+    },
+    "figure_dpi": 300
+  }
+}

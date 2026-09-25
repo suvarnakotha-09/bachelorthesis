@@ -1,0 +1,15 @@
+# Core environment for the reproducible experiment (Python 3.12).
+# Transitive versions are also recorded in outputs/run_metadata.json at runtime.
+numpy==2.5.3
+pandas==3.0.6
+scikit-learn==1.9.1
+matplotlib==3.11.2
+torch==2.14.0
+timesfm[torch]==2.0.2
+huggingface-hub==2.0.0
+safetensors==0.8.0
+psutil==7.2.2
+
+# Notebook tooling
+jupyterlab==4.6.4
+ipykernel==7.3.0

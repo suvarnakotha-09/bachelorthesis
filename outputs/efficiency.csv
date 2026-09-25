@@ -1,0 +1,4 @@
+model,trainable,device,inference_batch_size,training_time_seconds,training_peak_rss_mb,inference_latency_ms_per_batch,inference_latency_ms_per_sample,inference_latency_ms_per_1000_samples,inference_peak_rss_mb,peak_rss_mb,n_test_batches,n_test_samples,parameter_count
+LSTM,True,cpu,64,60.71970519999741,394.1171875,4.890316841805256,0.07681549272015531,76.8154927201553,394.37890625,394.37890625,95,6048,50497
+DSS-softmax,True,cpu,64,1032.1284833999816,510.078125,37.62386421011271,0.590983316792445,590.983316792445,408.1015625,510.078125,95,6048,29825
+TimesFM 2.5 PyTorch,False,cpu,32,,,412.0699736841121,6.472659970236549,6472.659970236549,1314.38671875,1314.38671875,95,6048,231289280

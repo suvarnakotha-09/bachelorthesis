@@ -1,0 +1,4 @@
+model,split,context_len,horizon,feature_set,mae,rmse,mape,parameter_count,n_test_samples
+LSTM,test,24,1,traffic_speed_only,1.949396153724185,4.003988211848458,4.645629736911447,50497,6048
+DSS-softmax,test,24,1,traffic_speed_only,2.2985320355055996,4.021867741501647,5.502943744185441,29825,6048
+TimesFM 2.5 PyTorch,test,24,1,traffic_speed_only,2.0182683008011137,4.811115940596405,5.2016128094101575,231289280,6048
