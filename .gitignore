@@ -47,6 +47,10 @@ thesis.tex
 thesis.ipynb
 thesis-refs.bib
 thesis_suvarna/
+/bth.cls
+/changepage.sty
+/bthnotext.pdf
+/opposition_Thesis.pdf
 /flowchart.png
 /mae_rmse_speed.png
 /mape_percent.png

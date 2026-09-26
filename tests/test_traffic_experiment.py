@@ -10,10 +10,13 @@ import torch
 from traffic_experiment import (
     CONTEXT_LEN,
     HORIZON,
+    BATCH_SIZE,
+    TIMESFM_BATCH_SIZE,
     DSSSoftmaxForecaster,
     LSTMForecaster,
     compute_metrics,
     count_parameters,
+    dss_softmax_coefficients,
     portable_path,
     prepare_data,
 )
@@ -52,6 +55,25 @@ class ExperimentContractTests(unittest.TestCase):
             self.assertEqual(tuple(output.shape), (3, HORIZON))
             self.assertGreater(count_parameters(model), 0)
             self.assertTrue(torch.isfinite(output).all())
+
+    def test_protocol_batch_sizes(self) -> None:
+        self.assertEqual(BATCH_SIZE, 64)
+        self.assertEqual(TIMESFM_BATCH_SIZE, 32)
+
+    def test_dss_softmax_discretization_matches_canonical_formula(self) -> None:
+        eigenvalues = torch.tensor([-0.4 + 0.3j, -0.8 + 0.5j], dtype=torch.complex64)
+        dt = torch.tensor([[0.05], [0.1]], dtype=torch.float32)
+        length = 24
+        transition, input_coefficient = dss_softmax_coefficients(
+            eigenvalues, dt, length
+        )
+        expected_transition = torch.exp(eigenvalues.unsqueeze(0) * dt)
+        expected_input = (expected_transition - 1.0) / (
+            eigenvalues.unsqueeze(0)
+            * (torch.exp(eigenvalues.unsqueeze(0) * (length * dt)) - 1.0)
+        )
+        self.assertTrue(torch.allclose(transition, expected_transition, atol=1e-6, rtol=1e-5))
+        self.assertTrue(torch.allclose(input_coefficient, expected_input, atol=1e-6, rtol=1e-5))
 
     def test_metadata_paths_are_portable(self) -> None:
         self.assertEqual(

@@ -1006,6 +1006,45 @@ def _hippo_d_eigenvalues(state_dim: int) -> np.ndarray:
     return np.asarray(eigenvalues[order[:n]], dtype=np.complex64)
 
 
+def dss_softmax_coefficients(
+    eigenvalues: torch.Tensor, dt: torch.Tensor, sequence_length: int
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Return DSS-softmax transition and input coefficients.
+
+    The canonical length-normalized discretization is
+    ``a = exp(lambda * dt)`` and
+    ``b = (a - 1) / (lambda * (exp(L * lambda * dt) - 1))``.
+    """
+
+    exponent = eigenvalues.unsqueeze(0) * (sequence_length * dt)
+    exponent = torch.complex(
+        exponent.real.clamp(min=-30.0, max=30.0),
+        exponent.imag.clamp(min=-30.0, max=30.0),
+    )
+    denominator = torch.exp(exponent) - 1.0 + 0j
+    denominator = torch.where(
+        denominator.abs() < 1e-7,
+        torch.complex(
+            torch.full_like(denominator.real, 1e-7),
+            torch.zeros_like(denominator.imag),
+        ),
+        denominator,
+    )
+    transition_exponent = eigenvalues.unsqueeze(0) * dt
+    transition_exponent = torch.complex(
+        transition_exponent.real.clamp(min=-30.0, max=30.0),
+        transition_exponent.imag.clamp(min=-30.0, max=30.0),
+    )
+    transition = torch.exp(transition_exponent)
+    safe_lambda = torch.where(
+        eigenvalues.abs() < 1e-7,
+        torch.complex(torch.ones_like(eigenvalues.real), torch.zeros_like(eigenvalues.imag)),
+        eigenvalues,
+    )
+    input_coefficient = (transition - 1.0 + 0j) / safe_lambda.unsqueeze(0) / denominator
+    return transition, input_coefficient
+
+
 class DSSSoftmaxBlock(nn.Module):
     """Canonical DSS-softmax diagonal state-space block.
 
@@ -1015,8 +1054,8 @@ class DSSSoftmaxBlock(nn.Module):
     fixed sequence length ``L`` and hidden channel ``h``:
 
     ``a[h,i] = exp(lambda[i] * dt[h])`` and
-    ``b[h,i] = (a[h,i]-1) * lambda[i] /
-    (exp(L*lambda[i]*dt[h])-1)``.
+    ``b[h,i] = (a[h,i]-1) /
+    (lambda[i] * (exp(L*lambda[i]*dt[h])-1))``.
 
     The state is updated with ``x_i[t] = a*x_i[t-1] + b*u_h[t]`` and the
     layer output is the real part of ``sum_i W[h,i] * x_i[t]``.  This is the
@@ -1054,29 +1093,9 @@ class DSSSoftmaxBlock(nn.Module):
         sequence_length = int(tensor.shape[1])
         eigenvalues = torch.complex(self.lambda_real, self.lambda_imag)
         dt = torch.exp(self.log_dt.clamp(min=-12.0, max=2.0)).unsqueeze(-1)
-        exponent = eigenvalues.unsqueeze(0) * (sequence_length * dt)
-        exponent = torch.complex(
-            exponent.real.clamp(min=-30.0, max=30.0),
-            exponent.imag.clamp(min=-30.0, max=30.0),
+        transition, input_coefficient = dss_softmax_coefficients(
+            eigenvalues, dt, sequence_length
         )
-        denominator = torch.exp(exponent) - 1.0 + 0j
-        denominator = torch.where(
-            denominator.abs() < 1e-7,
-            torch.complex(torch.full_like(denominator.real, 1e-7), torch.zeros_like(denominator.imag)),
-            denominator,
-        )
-        transition_exponent = eigenvalues.unsqueeze(0) * dt
-        transition_exponent = torch.complex(
-            transition_exponent.real.clamp(min=-30.0, max=30.0),
-            transition_exponent.imag.clamp(min=-30.0, max=30.0),
-        )
-        transition = torch.exp(transition_exponent)
-        safe_lambda = torch.where(
-            eigenvalues.abs() < 1e-7,
-            torch.complex(torch.ones_like(eigenvalues.real), torch.zeros_like(eigenvalues.imag)),
-            eigenvalues,
-        )
-        input_coefficient = (transition - 1.0 + 0j) * safe_lambda.unsqueeze(0) / denominator
         weights = torch.complex(self.weight_real, self.weight_imag)
 
         batch_size = int(tensor.shape[0])
@@ -1969,7 +1988,7 @@ def save_efficiency_latex_table(
     lines = [
         r"\begin{table}[htbp]",
         r"\centering",
-        r"\caption{Measured computational records for the common test workload.}",
+        r"\caption{Measured computational records for the common test workload. Process RSS is sampled during each sequential evaluation stage and is not an isolated per-model memory footprint.}",
         r"\label{tab:efficiency_results}",
         r"\begin{tabular}{lrrrr}",
         r"\hline",
@@ -2299,8 +2318,14 @@ def run_experiment(
             context_len=context_len,
             horizon=horizon,
         )
+        timesfm_loader = make_data_loader(
+            prepared.datasets["test"],
+            batch_size=TIMESFM_BATCH_SIZE,
+            shuffle=False,
+            num_workers=num_workers,
+        )
         timesfm_result = _predict_timesfm(
-            timesfm, loaders["test"], prepared.scaler, device=selected_device
+            timesfm, timesfm_loader, prepared.scaler, device=selected_device
         )
         timesfm_parameter_count = timesfm.parameter_count
         metric_rows.append(

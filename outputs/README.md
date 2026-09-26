@@ -6,6 +6,9 @@ not as hand-edited source files.
 
 - `metrics.csv` contains the test metrics, task metadata, and sample counts.
 - `efficiency.csv` contains timing, parameter, device, and memory measurements.
+  Peak RSS is sampled from the whole Python process during each sequential
+  model stage; it is useful as a reproducibility record but is not an isolated
+  per-model memory footprint.
 - `run_metadata.json` records the seed, split boundaries, scaler range, package
   versions, hardware, and model configuration.
 - `figures/` contains the accuracy overview, unit-separated accuracy figures,

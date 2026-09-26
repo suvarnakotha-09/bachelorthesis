@@ -60,7 +60,7 @@ Run the full three-model comparison:
 
 The full run trains the two supervised models, evaluates all 6,048 test
 windows, and measures accuracy, parameter counts, training time, inference
-latency, and peak process memory. On CPU it can take several minutes; the
+latency, and peak process memory. On CPU it can take tens of minutes; the
 initial TimesFM checkpoint download can take longer.
 
 ## Recorded results
@@ -96,5 +96,9 @@ Check that the Python sources compile:
 ```
 
 The data directory contains the derived METR-LA five-minute table used by the
-experiment and the retained source weather table. Weather columns are present
-for provenance but are not model inputs in the primary comparison.
+experiment and the retained source weather table. The traffic benchmark is
+attributed to Li et al., *Diffusion Convolutional Recurrent Neural Network:
+Data-Driven Traffic Forecasting* (ICLR 2018). This repository stores a derived
+CSV prepared for the experiment; users should verify the upstream dataset
+terms before redistributing it. Weather columns are present for provenance but
+are not model inputs in the primary comparison.

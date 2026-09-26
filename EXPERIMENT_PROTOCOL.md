@@ -84,8 +84,10 @@ under explicit `DSS-inspired` aliases for a separate ablation.
   same optimization regime as the supervised models.
 
 Training time, one-step inference latency per 1,000 test windows, device, and
-peak process memory are recorded in `outputs/efficiency.csv`. Accuracy and
-computational claims must use these records rather than unsupported adjectives.
+peak process memory are recorded in `outputs/efficiency.csv`. Process RSS is
+sampled during each sequential model stage and is not an isolated per-model
+memory footprint. Accuracy and computational claims must use these records
+rather than unsupported adjectives.
 
 ## Outputs
 
